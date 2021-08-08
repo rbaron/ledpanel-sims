@@ -2,8 +2,18 @@
 #include <Adafruit_NeoMatrix.h>
 #include <Adafruit_NeoPixel.h>
 #include <Arduino.h>
+#include <math.h>
+
+#include "ledpanel/display.h"
+#include "ledpanel/scene.h"
+#include "ledpanel/simulation.h"
+#include "ledpanel/simulations/galaxy.h"
+#include "ledpanel/time.h"
 
 #define PIN 23
+
+using pos_t = ledpanel::pos_t;
+using Color = ledpanel::Color;
 
 Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(
     8, 8, 4, 3, PIN,
@@ -15,41 +25,70 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(
 const uint16_t colors[] = {matrix.Color(255, 0, 0), matrix.Color(0, 255, 0),
                            matrix.Color(0, 0, 255)};
 
-#define N_POINTS 48
-std::vector<std::pair<int, int>> points;
+class LedPanelDisplay : public ledpanel::Display {
+  void DrawPixel(pos_t y, pos_t x, const Color &c) override {
+    matrix.drawPixel(x, y, matrix.Color(c.r, c.g, c.g));
+    // Serial.printf("Drew pixel %d %d %d\n", y, x, c.r);
+  };
+
+  pos_t GetHeight() const override {
+    return matrix.height();
+  }
+
+  pos_t GetWidth() const override {
+    return matrix.width();
+  }
+};
+
+LedPanelDisplay led_panel_display;
+
+class ArduinoTimeProvider : public ledpanel::TimeProvider {
+ public:
+  ledpanel::time_t GetMillis() const override {
+    return millis();
+  }
+};
+
+class ArduinoRandomProvider : public ledpanel::RandomProvider {
+ public:
+  int RandInt(int min, int max) override {
+    return min + random(max - min);
+  }
+};
+
+ArduinoTimeProvider time_provider;
+ArduinoRandomProvider random_provider;
+
+#define N_STARS 64
+
+ledpanel::simulations::Galaxy *galaxy = NULL;
 
 void setup() {
+  Serial.begin(9600);
+
+  galaxy = new ledpanel::simulations::Galaxy(&time_provider, &random_provider,
+                                             &led_panel_display, N_STARS);
+
   matrix.begin();
   matrix.setTextWrap(false);
   matrix.setBrightness(40);
   matrix.setTextColor(colors[0]);
   matrix.drawPixel(0, 0, colors[0]);
   matrix.drawRect(0, 0, 4, 4, colors[1]);
-
-  randomSeed(analogRead(0));
-  for (int i = 0; i < N_POINTS; i++) {
-    points.emplace_back(static_cast<int>(random(matrix.width())),
-                        static_cast<int>(random(matrix.height())));
-  }
 }
 
-int x = matrix.width();
-int pass = 0;
-
-uint8_t col = 50;
-int dir = 1;
+unsigned long last_millis = millis();
 
 void loop() {
+  unsigned long current_millis = millis();
+
   matrix.fillScreen(0);
-  for (const auto &pair : points) {
-    matrix.drawPixel(pair.first, pair.second, matrix.Color(col, col, col));
-  }
-  if (col == 255 && dir == 1) {
-    dir = -1;
-  } else if (col == 50 && dir == -1) {
-    dir = 1;
-  }
-  col += dir;
+
+  galaxy->Update(current_millis - last_millis);
+  galaxy->Render(&led_panel_display);
+
+  last_millis = current_millis;
+
   matrix.show();
-  delay(10);
+  delay(1);
 }
