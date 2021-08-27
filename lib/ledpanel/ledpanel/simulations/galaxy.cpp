@@ -12,7 +12,8 @@ std::unique_ptr<Simulation> MakeStar(const Display *display,
   return std::make_unique<Star>(
       static_cast<pos_t>(rnd->RandInt(0, display->GetHeight())),
       static_cast<pos_t>(rnd->RandInt(0, display->GetWidth())),
-      static_cast<float>((rnd->RandInt(0, 100) >= 50 ? 1 : -1) * 1 / 1e4f),
+      static_cast<float>((rnd->RandInt(0, 100) >= 50 ? 1 : -1) * 1 /
+                         (5 * 1e4f)),
       static_cast<float>(rnd->RandInt(0, 1000)) / 1000);
 }
 
@@ -29,7 +30,7 @@ std::unique_ptr<Simulation> MakeShootingStar(const Display *display,
 std::unique_ptr<Simulation> MakeSimulation(const Display *display,
                                            RandomProvider *rnd) {
   int rand_val = rnd->RandInt(0, 100);
-  if (rand_val < 10) {
+  if (rand_val < 6) {
     return MakeShootingStar(display, rnd);
   } else {
     return MakeStar(display, rnd);

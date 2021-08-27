@@ -5,10 +5,10 @@ namespace simulations {
 namespace {
 
 inline bool GetCell(const std::bitset<D_SIZE> &b, pos_t y, pos_t x) {
-  if (x < 0 || x > D_WIDTH - 1 || y < 0 || y > D_HEIGHT - 1) {
+  if (x < 0 || x > LP_DISPLAY_WIDTH - 1 || y < 0 || y > LP_DISPLAY_HEIGHT - 1) {
     return false;
   }
-  return b[y * D_WIDTH + x];
+  return b[y * LP_DISPLAY_WIDTH + x];
 }
 
 inline int AliveNeighbors(const std::bitset<D_SIZE> &b, pos_t y, pos_t x) {
@@ -40,8 +40,8 @@ void GameOfLife::Update(time_t time_delta_ms) {
   auto &dst = first_buffer_ ? buff2 : buff1;
 
   for (size_t i = 0; i < D_SIZE; i++) {
-    pos_t y = i / D_WIDTH;
-    pos_t x = i % D_WIDTH;
+    pos_t y = i / LP_DISPLAY_WIDTH;
+    pos_t x = i % LP_DISPLAY_WIDTH;
     int alive_neighbors = AliveNeighbors(src, y, x);
     if (src[i]) {
       dst.set(i, alive_neighbors == 2 || alive_neighbors == 3);
@@ -60,8 +60,8 @@ void GameOfLife::Render(Display *display) const {
     if (!src[i]) {
       continue;
     }
-    pos_t y = i / D_WIDTH;
-    pos_t x = i % D_WIDTH;
+    pos_t y = i / LP_DISPLAY_WIDTH;
+    pos_t x = i % LP_DISPLAY_WIDTH;
     display->DrawPixel(y, x, c);
   }
 }

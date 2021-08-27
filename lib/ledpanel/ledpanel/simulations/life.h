@@ -9,13 +9,12 @@
 #include "ledpanel/scene.h"
 #include "ledpanel/simulation.h"
 #include "ledpanel/time.h"
+#include "lp_config.h"
 
 namespace ledpanel {
 namespace simulations {
 
-#define D_HEIGHT 24
-#define D_WIDTH 32
-#define D_SIZE (D_HEIGHT * D_WIDTH)
+#define D_SIZE (LP_DISPLAY_HEIGHT * LP_DISPLAY_WIDTH)
 
 class GameOfLife : public Scene {
  public:

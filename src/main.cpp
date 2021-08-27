@@ -18,7 +18,7 @@ using pos_t = ledpanel::pos_t;
 using Color = ledpanel::Color;
 
 Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(
-    8, 8, 4, 3, PIN,
+    8, 8, 4, 4, PIN,
     NEO_TILE_TOP + NEO_TILE_RIGHT + NEO_TILE_PROGRESSIVE + NEO_TILE_ZIGZAG +
         NEO_MATRIX_BOTTOM + NEO_MATRIX_RIGHT + NEO_MATRIX_ZIGZAG +
         NEO_MATRIX_COLUMNS,
@@ -65,19 +65,19 @@ class ArduinoRandomProvider : public ledpanel::RandomProvider {
 ArduinoTimeProvider time_provider;
 ArduinoRandomProvider random_provider;
 
-#define N_STARS 64
+#define N_STARS 32
 
 ledpanel::Scene *scene = NULL;
 
 void setup() {
   Serial.begin(9600);
 
-  // scene = new ledpanel::simulations::Galaxy(&time_provider, &random_provider,
-  //                                           &led_panel_display, N_STARS);
+  scene = new ledpanel::simulations::Galaxy(&time_provider, &random_provider,
+                                            &led_panel_display, N_STARS);
   // scene =
   //     new ledpanel::simulations::GameOfLife(&time_provider,
   //     &random_provider);
-  scene = new ledpanel::simulations::Fireflies(&random_provider);
+  // scene = new ledpanel::simulations::Fireflies(&random_provider);
 
   matrix.begin();
   matrix.setTextWrap(false);
