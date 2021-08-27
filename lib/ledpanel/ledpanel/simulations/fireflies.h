@@ -14,7 +14,6 @@
 namespace ledpanel {
 namespace simulations {
 
-// class Firefly : public Simulation {
 class Firefly {
  public:
   enum class State {
@@ -25,15 +24,11 @@ class Firefly {
 
   explicit Firefly(RandomProvider *rnd);
 
-  void Tick(time_t time_delta_ms, std::vector<Firefly *> &fireflies);
+  void Tick(time_t time_delta_ms, std::vector<Firefly> &fireflies);
 
   void Render(Display *display) const;
 
   void Interact(Firefly &other) const;
-
-  // bool IsFinished() const override {
-  //   return false;
-  // };
 
  private:
   float y_, x_;
@@ -53,7 +48,7 @@ class Fireflies : public Scene {
   void Render(Display *display) const override;
 
  private:
-  std::vector<Firefly *> fireflies_;
+  std::vector<Firefly> fireflies_;
   RandomProvider *rnd_;
 };
 

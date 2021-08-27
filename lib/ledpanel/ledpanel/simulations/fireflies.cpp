@@ -16,7 +16,7 @@ Firefly::Firefly(RandomProvider *rnd) : state_(State::IDLE), rnd_(rnd) {
   clock_ = rnd->Rand();
 }
 
-void Firefly::Tick(time_t time_delta_ms, std::vector<Firefly *> &fireflies) {
+void Firefly::Tick(time_t time_delta_ms, std::vector<Firefly> &fireflies) {
   y_ += time_delta_ms * speed_ * sin(angle_);
   x_ += time_delta_ms * speed_ * cos(angle_);
 
@@ -43,7 +43,7 @@ void Firefly::Tick(time_t time_delta_ms, std::vector<Firefly *> &fireflies) {
       state_ = State::FLASHING_UP;
       clock_ = 0.0f;
       for (auto &f : fireflies) {
-        this->Interact(*f);
+        this->Interact(f);
       }
     }
   } else if (state_ == State::FLASHING_UP) {
@@ -74,32 +74,30 @@ void Firefly::Interact(Firefly &other) const {
     return;
   }
   float distance = fabs(x_ - other.x_) + fabs(y_ - other.y_);
-  if (distance > 4) {
+  if (distance > 5) {
     return;
   }
 
-  other.clock_ = std::min(1.0, other.clock_ + 0.1);
+  other.clock_ = std::min(1.0, other.clock_ + 0.12);
 }
 
 Fireflies::Fireflies(RandomProvider *rnd) : rnd_(rnd) {
   fireflies_.reserve(LP_N_FIREFLIES);
   for (int i = 0; i < LP_N_FIREFLIES; i++) {
-    fireflies_.push_back(new Firefly(rnd));
+    // fireflies_.push_back(new Firefly(rnd));
+    fireflies_.emplace_back(rnd);
   }
 }
 
 void Fireflies::Update(time_t time_delta_ms) {
   for (auto &f : fireflies_) {
-    f->Tick(time_delta_ms, fireflies_);
-    // for (auto &other : fireflies_) {
-    //   f->Interact(*other);
-    // }
+    f.Tick(time_delta_ms, fireflies_);
   }
 }
 
 void Fireflies::Render(Display *display) const {
   for (const auto f : fireflies_) {
-    f->Render(display);
+    f.Render(display);
   }
 }
 

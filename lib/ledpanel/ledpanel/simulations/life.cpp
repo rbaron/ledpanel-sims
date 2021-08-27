@@ -53,7 +53,7 @@ void GameOfLife::Update(time_t time_delta_ms) {
 }
 
 void GameOfLife::Render(Display *display) const {
-  static const Color c(255, 0, 255);
+  static const Color c(127, 40, 50);
   auto &src = first_buffer_ ? buff1 : buff2;
 
   for (size_t i = 0; i < D_SIZE; i++) {

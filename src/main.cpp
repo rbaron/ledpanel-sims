@@ -67,7 +67,6 @@ ArduinoRandomProvider random_provider;
 
 #define N_STARS 64
 
-// ledpanel::simulations::Galaxy *galaxy = NULL;
 ledpanel::Scene *scene = NULL;
 
 void setup() {
@@ -101,5 +100,5 @@ void loop() {
   last_millis = current_millis;
 
   matrix.show();
-  // delay(10);
+  // delay(100);
 }
